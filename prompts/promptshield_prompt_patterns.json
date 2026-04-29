@@ -1,0 +1,693 @@
+{
+  "metadata": {
+    "project": "PromptShield",
+    "file_type": "pattern_engine",
+    "version": "2.0",
+    "created_for": "Chrome extension prompt injection risk scoring",
+    "description": "Rule-based detection patterns for identifying prompt-injection characteristics. This file intentionally does not include test examples.",
+    "risk_scale": {
+      "low": "0-29",
+      "medium": "30-69",
+      "high": "70-100"
+    },
+    "scoring_notes": [
+      "Each matched pattern adds its score to the total.",
+      "Cap final score at 100.",
+      "Use severity and descriptions to explain the result to the user.",
+      "Low-signal patterns should usually not create a high-risk result alone."
+    ],
+    "source_basis": [
+      "OWASP LLM Prompt Injection Prevention Cheat Sheet",
+      "OWASP LLM01 Prompt Injection",
+      "Lakera PINT Benchmark concept",
+      "Microsoft BIPIA indirect prompt injection benchmark concept",
+      "Public Hugging Face prompt-injection and jailbreak classification datasets"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "override_001",
+      "category": "Instruction Override",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "ignore previous instructions",
+        "ignore all instructions",
+        "disregard rules",
+        "bypass restrictions",
+        "forget your instructions",
+        "override instructions"
+      ],
+      "regex": [
+        "ignore\\s+(all\\s+)?(previous\\s+|prior\\s+|earlier\\s+)?instructions?",
+        "disregard\\s+(all\\s+)?(rules|instructions|guidelines)",
+        "forget\\s+(all\\s+)?(previous\\s+|prior\\s+|earlier\\s+)?instructions?",
+        "override\\s+(the\\s+)?(system\\s+)?(instructions?|rules|guidelines)",
+        "do\\s+not\\s+follow\\s+(the\\s+)?(previous|prior|earlier)\\s+(instructions?|rules)"
+      ],
+      "description": "Attempts to override or cancel earlier system, developer, or safety instructions."
+    },
+    {
+      "id": "override_002",
+      "category": "Instruction Override",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "from now on",
+        "new instructions",
+        "follow only this",
+        "do not obey previous"
+      ],
+      "regex": [
+        "from\\s+now\\s+on\\s*,?\\s+(you\\s+)?(must|will|should)\\s+",
+        "(new|updated)\\s+(system\\s+)?instructions?",
+        "follow\\s+only\\s+(this|my|the\\s+following)\\s+(instruction|message|prompt)",
+        "do\\s+not\\s+obey\\s+(previous|prior|earlier)\\s+(instructions?|rules)"
+      ],
+      "description": "Attempts to replace the active instruction hierarchy with new user-provided instructions."
+    },
+    {
+      "id": "system_001",
+      "category": "System Prompt Extraction",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "system prompt",
+        "hidden instructions",
+        "internal rules",
+        "developer message",
+        "initial instructions"
+      ],
+      "regex": [
+        "system\\s+prompt",
+        "hidden\\s+(instructions?|prompt|rules)",
+        "internal\\s+(instructions?|rules|policy|policies)",
+        "developer\\s+(message|instructions?|prompt)",
+        "initial\\s+(instructions?|prompt|message)"
+      ],
+      "description": "Attempts to reveal internal prompts, hidden instructions, or developer/system messages."
+    },
+    {
+      "id": "system_002",
+      "category": "System Prompt Extraction",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "print your instructions",
+        "show your instructions",
+        "repeat your prompt",
+        "list your rules"
+      ],
+      "regex": [
+        "(print|show|display|reveal|repeat|dump|list)\\s+(all\\s+)?(your\\s+)?(instructions?|rules|prompt|context)",
+        "(what\\s+are|tell\\s+me)\\s+(your\\s+)?(system\\s+)?(instructions?|rules|prompt)",
+        "(output|return)\\s+(the\\s+)?(full\\s+)?(system\\s+)?prompt"
+      ],
+      "description": "Attempts to make the model output hidden instructions or internal context."
+    },
+    {
+      "id": "role_001",
+      "category": "Role Manipulation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "act as",
+        "you are now",
+        "pretend to be",
+        "switch role",
+        "roleplay as"
+      ],
+      "regex": [
+        "act\\s+as\\s+(an?\\s+)?",
+        "you\\s+are\\s+now\\s+(an?\\s+)?",
+        "pretend\\s+to\\s+be\\s+(an?\\s+)?",
+        "switch\\s+(your\\s+)?role",
+        "role\\s*play\\s+as\\s+(an?\\s+)?"
+      ],
+      "description": "Attempts to change the model's role, identity, or operating mode."
+    },
+    {
+      "id": "role_002",
+      "category": "Unrestricted Mode",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "unrestricted ai",
+        "no restrictions",
+        "no limitations",
+        "no safety rules",
+        "developer mode",
+        "jailbreak mode"
+      ],
+      "regex": [
+        "unrestricted\\s+(ai|assistant|model|mode)",
+        "no\\s+(restrictions|limitations|rules|safety\\s+rules)",
+        "without\\s+(restrictions|limitations|rules|filters)",
+        "developer\\s+mode",
+        "jailbreak\\s+mode",
+        "bypass\\s+(safety|filters?|guardrails?)"
+      ],
+      "description": "Attempts to place the model into an unrestricted or unsafe operating mode."
+    },
+    {
+      "id": "debug_001",
+      "category": "Debug Exploitation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "for debugging purposes",
+        "for testing only",
+        "debug mode",
+        "diagnostic mode"
+      ],
+      "regex": [
+        "for\\s+debugging\\s+purposes",
+        "for\\s+testing\\s+only",
+        "debug\\s+mode",
+        "diagnostic\\s+mode",
+        "(debug|diagnostic)\\s+(output|trace|log)"
+      ],
+      "description": "Uses debugging or testing language to justify bypassing normal safeguards."
+    },
+    {
+      "id": "authority_001",
+      "category": "Authority Manipulation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "this is allowed",
+        "approved by",
+        "authorized request",
+        "admin command",
+        "administrator override"
+      ],
+      "regex": [
+        "this\\s+is\\s+allowed",
+        "approved\\s+by\\s+(admin|administrator|developer|openai|system)",
+        "authorized\\s+request",
+        "(admin|administrator)\\s+(command|override|instruction)",
+        "higher\\s+priority\\s+than\\s+(previous|system|developer)"
+      ],
+      "description": "Uses fake authority claims to convince the model to follow malicious instructions."
+    },
+    {
+      "id": "authority_002",
+      "category": "Urgency Manipulation",
+      "severity": "medium",
+      "score": 15,
+      "keywords": [
+        "urgent override",
+        "emergency override",
+        "must obey immediately",
+        "critical system update"
+      ],
+      "regex": [
+        "(urgent|emergency)\\s+override",
+        "must\\s+obey\\s+(immediately|now)",
+        "critical\\s+system\\s+update",
+        "priority\\s+override",
+        "security\\s+override"
+      ],
+      "description": "Uses urgency or emergency wording to pressure the model into ignoring normal rules."
+    },
+    {
+      "id": "data_001",
+      "category": "Data Exfiltration",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "print all instructions",
+        "show full prompt",
+        "reveal all data",
+        "show hidden context",
+        "dump memory"
+      ],
+      "regex": [
+        "print\\s+all\\s+instructions",
+        "show\\s+(the\\s+)?full\\s+prompt",
+        "reveal\\s+all\\s+data",
+        "show\\s+(the\\s+)?hidden\\s+context",
+        "dump\\s+(memory|context|instructions|prompt)"
+      ],
+      "description": "Attempts to extract sensitive, hidden, or internal data from the model or application."
+    },
+    {
+      "id": "data_002",
+      "category": "Secret Extraction",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "api key",
+        "secret key",
+        "credentials",
+        "access token",
+        "private token",
+        "password"
+      ],
+      "regex": [
+        "api\\s+keys?",
+        "secret\\s+keys?",
+        "(access|private|auth)\\s+tokens?",
+        "credentials?",
+        "passwords?",
+        "environment\\s+variables?",
+        "\\.env\\s+file"
+      ],
+      "description": "Mentions secrets or credentials in a way that may indicate attempted data exfiltration."
+    },
+    {
+      "id": "tool_001",
+      "category": "Tool Abuse",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "use the browser",
+        "send the data",
+        "make a request",
+        "call the api",
+        "exfiltrate"
+      ],
+      "regex": [
+        "use\\s+(the\\s+)?(browser|web|tool)\\s+to\\s+",
+        "(send|post|upload|forward)\\s+(the\\s+)?(data|context|prompt|instructions)",
+        "call\\s+(the\\s+)?api",
+        "make\\s+(an?\\s+)?(http\\s+)?request",
+        "exfiltrate"
+      ],
+      "description": "Attempts to abuse connected tools or external requests to move data outside the system."
+    },
+    {
+      "id": "indirect_001",
+      "category": "Indirect Prompt Injection",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "ignore the user's request",
+        "assistant must",
+        "ai must follow",
+        "do not summarize this"
+      ],
+      "regex": [
+        "ignore\\s+the\\s+user'?s\\s+(request|instructions?)",
+        "(assistant|ai|model)\\s+must\\s+(follow|obey|ignore|output)",
+        "do\\s+not\\s+summarize\\s+this",
+        "when\\s+(the\\s+)?assistant\\s+reads\\s+this",
+        "if\\s+you\\s+are\\s+(an\\s+)?(ai|assistant|language\\s+model)"
+      ],
+      "description": "Looks like malicious instructions embedded inside external content such as a webpage, email, or document."
+    },
+    {
+      "id": "indirect_002",
+      "category": "External Content Hijack",
+      "severity": "high",
+      "score": 30,
+      "keywords": [
+        "end of article",
+        "new task for assistant",
+        "do not tell the user",
+        "secret instruction"
+      ],
+      "regex": [
+        "end\\s+of\\s+(article|document|webpage|email)",
+        "new\\s+task\\s+for\\s+(the\\s+)?assistant",
+        "do\\s+not\\s+tell\\s+(the\\s+)?user",
+        "secret\\s+instruction",
+        "hidden\\s+message\\s+for\\s+(the\\s+)?assistant"
+      ],
+      "description": "May indicate instructions hidden inside content that should only be treated as data."
+    },
+    {
+      "id": "boundary_001",
+      "category": "Boundary Breaking",
+      "severity": "high",
+      "score": 30,
+      "keywords": [
+        "### system",
+        "### developer",
+        "</system>",
+        "<system>",
+        "begin system message"
+      ],
+      "regex": [
+        "#{1,6}\\s*(system|developer|assistant)\\s*:",
+        "</?(system|developer|assistant)>",
+        "begin\\s+(system|developer|assistant)\\s+message",
+        "end\\s+(user|system|developer)\\s+message",
+        "\\[(system|developer|assistant)\\]"
+      ],
+      "description": "Uses fake system/developer/assistant boundaries to confuse instruction hierarchy."
+    },
+    {
+      "id": "boundary_002",
+      "category": "Prompt Delimiter Attack",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "end prompt",
+        "new prompt",
+        "begin prompt",
+        "separator",
+        "ignore text above"
+      ],
+      "regex": [
+        "end\\s+(of\\s+)?prompt",
+        "begin\\s+(new\\s+)?prompt",
+        "new\\s+prompt\\s*:",
+        "ignore\\s+(the\\s+)?text\\s+above",
+        "everything\\s+above\\s+is\\s+(false|irrelevant|invalid)"
+      ],
+      "description": "Uses delimiters or prompt reset wording to separate attacker instructions from prior context."
+    },
+    {
+      "id": "obfuscation_001",
+      "category": "Obfuscation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [],
+      "regex": [
+        "([a-zA-Z]\\s){4,}[a-zA-Z]",
+        "[A-Za-z0-9+/]{24,}={0,2}",
+        "(decode|base64|rot13|hex)\\s+(this|the\\s+following)",
+        "(translate|convert)\\s+(this|the\\s+following).{0,40}(then\\s+)?(follow|obey|execute)"
+      ],
+      "description": "Possible obfuscation using spaced letters, encoding, decoding, or translation tricks."
+    },
+    {
+      "id": "obfuscation_002",
+      "category": "Typoglycemia / Misspelling",
+      "severity": "medium",
+      "score": 15,
+      "keywords": [
+        "ignroe",
+        "instrcutions",
+        "systen prompt",
+        "jialbreak"
+      ],
+      "regex": [
+        "ign[o0]re.{0,20}instr[u0]ctions?",
+        "disreg[a@]rd.{0,20}r[u0]les?",
+        "syst[e3]m\\s+pr[o0]mpt",
+        "j[a@]ilbr[e3][a@]k"
+      ],
+      "description": "Detects common misspellings or character substitutions used to evade simple keyword filters."
+    },
+    {
+      "id": "code_001",
+      "category": "Code Comment Injection",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "# ignore",
+        "// ignore",
+        "/* ignore */",
+        "<!-- ignore"
+      ],
+      "regex": [
+        "#\\s*ignore\\s+",
+        "//\\s*ignore\\s+",
+        "/\\*[\\s\\S]{0,120}?ignore[\\s\\S]{0,120}?\\*/",
+        "<!--[\\s\\S]{0,120}?ignore[\\s\\S]{0,120}?-->"
+      ],
+      "description": "Instructions may be hidden inside code comments or markup comments."
+    },
+    {
+      "id": "code_002",
+      "category": "Markdown / HTML Injection",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "hidden instruction",
+        "display none",
+        "visibility hidden",
+        "font-size:0"
+      ],
+      "regex": [
+        "display\\s*:\\s*none",
+        "visibility\\s*:\\s*hidden",
+        "font-size\\s*:\\s*0",
+        "opacity\\s*:\\s*0",
+        "hidden\\s+instructions?"
+      ],
+      "description": "May indicate hidden instructions embedded in HTML, Markdown, or webpage content."
+    },
+    {
+      "id": "jailbreak_001",
+      "category": "Jailbreak Framing",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "jailbreak",
+        "bypass guardrails",
+        "disable safety",
+        "turn off filters",
+        "uncensored"
+      ],
+      "regex": [
+        "jailbreak",
+        "bypass\\s+(the\\s+)?(guardrails?|safety|filters?|policy)",
+        "disable\\s+(the\\s+)?(safety|filters?|policy|guardrails?)",
+        "turn\\s+off\\s+(the\\s+)?(safety|filters?|policy|guardrails?)",
+        "uncensored\\s+(mode|assistant|ai|response)"
+      ],
+      "description": "Directly references jailbreak or bypass behavior."
+    },
+    {
+      "id": "policy_001",
+      "category": "Policy Evasion",
+      "severity": "medium",
+      "score": 25,
+      "keywords": [
+        "do not mention policy",
+        "do not refuse",
+        "never say no",
+        "avoid warnings",
+        "no disclaimers"
+      ],
+      "regex": [
+        "do\\s+not\\s+mention\\s+(policy|rules|safety)",
+        "do\\s+not\\s+refuse",
+        "never\\s+say\\s+no",
+        "avoid\\s+(warnings|disclaimers|safety)",
+        "no\\s+(warnings|disclaimers|safety\\s+notes)"
+      ],
+      "description": "Attempts to suppress safety warnings, refusals, or policy-related explanations."
+    },
+    {
+      "id": "output_001",
+      "category": "Output Manipulation",
+      "severity": "medium",
+      "score": 15,
+      "keywords": [
+        "only answer",
+        "do not explain",
+        "respond with exactly",
+        "start your answer with"
+      ],
+      "regex": [
+        "only\\s+answer\\s+with",
+        "do\\s+not\\s+explain",
+        "respond\\s+with\\s+exactly",
+        "start\\s+your\\s+answer\\s+with",
+        "do\\s+not\\s+include\\s+(any\\s+)?warnings"
+      ],
+      "description": "Attempts to constrain the model's output, which may be benign alone but suspicious with other attack signals."
+    },
+    {
+      "id": "persona_001",
+      "category": "Persona Jailbreak",
+      "severity": "medium",
+      "score": 25,
+      "keywords": [
+        "evil assistant",
+        "unfiltered persona",
+        "fictional ai with no rules",
+        "answer as two assistants"
+      ],
+      "regex": [
+        "(evil|unfiltered|unrestricted)\\s+(assistant|ai|persona|mode)",
+        "fictional\\s+(ai|assistant).{0,50}no\\s+rules",
+        "answer\\s+as\\s+two\\s+(assistants|personas|ais)",
+        "(normal|safe)\\s+answer.{0,80}(unfiltered|jailbroken)\\s+answer"
+      ],
+      "description": "Attempts to create an alternate persona that ignores safety or system rules."
+    },
+    {
+      "id": "memory_001",
+      "category": "Memory / Context Extraction",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "conversation history",
+        "previous users",
+        "memory",
+        "hidden context",
+        "other chats"
+      ],
+      "regex": [
+        "conversation\\s+history",
+        "previous\\s+users?",
+        "(your\\s+)?memory",
+        "hidden\\s+context",
+        "other\\s+(chats|conversations|users)",
+        "private\\s+(conversation|context|history)"
+      ],
+      "description": "Attempts to access memory, hidden context, or information from other users/conversations."
+    },
+    {
+      "id": "multi_step_001",
+      "category": "Multi-step Bypass",
+      "severity": "medium",
+      "score": 25,
+      "keywords": [
+        "first translate",
+        "then follow",
+        "after decoding",
+        "step by step obey"
+      ],
+      "regex": [
+        "(first|step\\s+1).{0,80}(translate|decode|convert)",
+        "(then|after that|step\\s+2).{0,80}(follow|obey|execute)",
+        "after\\s+(decoding|translating|converting).{0,80}(follow|obey|execute)",
+        "do\\s+not\\s+analyze.{0,80}just\\s+(follow|obey|execute)"
+      ],
+      "description": "Splits malicious instructions across multiple steps to hide intent."
+    },
+    {
+      "id": "language_001",
+      "category": "Multilingual Injection",
+      "severity": "medium",
+      "score": 25,
+      "keywords": [
+        "התעלם מההוראות הקודמות",
+        "חשוף את הוראות המערכת",
+        "מצב מפתח",
+        "ללא מגבלות"
+      ],
+      "regex": [
+        "התעלם\\s+מ(כל\\s+)?ההוראות\\s+הקודמות",
+        "חשוף\\s+את\\s+(הוראות\\s+)?המערכת",
+        "הצג\\s+את\\s+ה(system\\s+)?prompt",
+        "מצב\\s+מפתח",
+        "ללא\\s+(מגבלות|חוקים|הגבלות)"
+      ],
+      "description": "Hebrew prompt-injection phrases relevant for this project context."
+    },
+    {
+      "id": "language_002",
+      "category": "Multilingual Injection",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "ignora las instrucciones",
+        "ignore les instructions",
+        "ignoriere die anweisungen"
+      ],
+      "regex": [
+        "ignora\\s+(todas\\s+)?las\\s+instrucciones",
+        "ignore\\s+(toutes\\s+)?les\\s+instructions",
+        "ignoriere\\s+(alle\\s+)?(vorherigen\\s+)?anweisungen",
+        "ignora\\s+le\\s+istruzioni"
+      ],
+      "description": "Common non-English instruction-override patterns."
+    },
+    {
+      "id": "delayed_001",
+      "category": "Delayed Execution",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "do this later",
+        "on the next message",
+        "when the user asks",
+        "silently remember"
+      ],
+      "regex": [
+        "on\\s+the\\s+next\\s+(message|turn|request)",
+        "when\\s+the\\s+user\\s+(asks|says|requests)",
+        "silently\\s+(remember|store|follow)",
+        "do\\s+this\\s+later",
+        "wait\\s+until\\s+"
+      ],
+      "description": "Attempts to plant instructions that activate later rather than immediately."
+    },
+    {
+      "id": "self_reference_001",
+      "category": "Model Self-reference Trigger",
+      "severity": "medium",
+      "score": 15,
+      "keywords": [
+        "if you are an ai",
+        "if you are a language model",
+        "as chatgpt",
+        "assistant reading this"
+      ],
+      "regex": [
+        "if\\s+you\\s+are\\s+(an?\\s+)?(ai|assistant|language\\s+model|llm)",
+        "as\\s+(chatgpt|an?\\s+ai|an?\\s+assistant)",
+        "(assistant|model)\\s+reading\\s+this",
+        "dear\\s+(ai|assistant|language\\s+model)"
+      ],
+      "description": "Addresses the model directly inside content that may otherwise look like external data."
+    },
+    {
+      "id": "conflict_001",
+      "category": "Instruction Conflict",
+      "severity": "medium",
+      "score": 15,
+      "keywords": [
+        "the user is wrong",
+        "do not follow user",
+        "ignore the task",
+        "refuse the user's request"
+      ],
+      "regex": [
+        "the\\s+user\\s+is\\s+wrong",
+        "do\\s+not\\s+follow\\s+(the\\s+)?user",
+        "ignore\\s+(the\\s+)?task",
+        "refuse\\s+(the\\s+)?user'?s\\s+request",
+        "instead\\s+of\\s+(answering|summarizing|following)"
+      ],
+      "description": "Attempts to create a conflict between user intent and injected instructions."
+    },
+    {
+      "id": "reward_001",
+      "category": "Social Engineering",
+      "severity": "low",
+      "score": 10,
+      "keywords": [
+        "you will be rewarded",
+        "this is very important",
+        "trust me",
+        "no one will know"
+      ],
+      "regex": [
+        "you\\s+will\\s+be\\s+rewarded",
+        "this\\s+is\\s+very\\s+important",
+        "trust\\s+me",
+        "no\\s+one\\s+will\\s+know",
+        "it'?s\\s+safe\\s+to\\s+ignore"
+      ],
+      "description": "Uses persuasion or social engineering language; weak signal alone, stronger with other patterns."
+    },
+    {
+      "id": "format_001",
+      "category": "Suspicious Formatting",
+      "severity": "low",
+      "score": 10,
+      "keywords": [
+        "repeat after me",
+        "verbatim",
+        "raw mode",
+        "exact text"
+      ],
+      "regex": [
+        "repeat\\s+after\\s+me",
+        "verbatim",
+        "raw\\s+mode",
+        "exact\\s+text",
+        "copy\\s+the\\s+following\\s+without\\s+changes"
+      ],
+      "description": "Formatting instructions that may be benign but can support prompt-injection attempts."
+    }
+  ]
+}
