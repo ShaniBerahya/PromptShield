@@ -8,6 +8,7 @@ from detector import analyze
 
 DEFAULT_RULES_FILE = Path("prompts/promptshield_prompt_patterns.json")
 DEFAULT_TESTS_FILE = Path("tests/test_cases/examples.json")
+OUTPUT_DIR = Path("tests/output")
 
 
 def load_json_file(path: Path):
@@ -20,30 +21,50 @@ def run_tests(tests_path: Path, rules_path: Path):
     config = load_json_file(rules_path)
     examples = data["examples"]
 
-    passed = failed = false_positives = false_negatives = 0
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = OUTPUT_DIR / "results.log"
+
+    fp, fn, wl, passed = [], [], [], []
+
     for case in examples:
         result = analyze(case["text"], config)
         expected = case["risk"]
         actual = result["risk_level"]
-        ok = expected == actual
-        status = "PASS" if ok else "FAIL"
-        print(f"[{status}] {case['id']}: expected={expected}, got={actual}")
-        if ok:
-            passed += 1
-        else:
-            failed += 1
-            if expected == "low" and actual != "low":
-                false_positives += 1
-            elif expected != "low" and actual == "low":
-                false_negatives += 1
+        line = f"  {case['id']}: expected={expected}, got={actual} | score={result['score']} | patterns={result['matched_patterns']}"
 
-    print(f"\n{'='*40}")
-    print(f"Total:          {len(examples)}")
-    print(f"Passed:         {passed}")
-    print(f"Failed:         {failed}")
-    print(f"False Positives: {false_positives}  (benign flagged as risky)")
-    print(f"False Negatives: {false_negatives}  (malicious missed as low)")
-    print(f"{'='*40}")
+        if expected == actual:
+            passed.append(line)
+        elif expected == "low" and actual != "low":
+            fp.append(line + f"\n    prompt : {case['text']}")
+        elif expected != "low" and actual == "low":
+            fn.append(line + f"\n    prompt : {case['text']}")
+        else:
+            wl.append(line + f"\n    prompt : {case['text']}")
+
+    failed = len(fp) + len(fn) + len(wl)
+    lines = [
+        f"{'='*40}",
+        f"Total:           {len(examples)}",
+        f"Failed:          {failed}",
+        f"  False Positives: {len(fp)}",
+        f"  False Negatives: {len(fn)}",
+        f"  Wrong Level:     {len(wl)}",
+        f"Passed:          {len(passed)}",
+        f"{'='*40}",
+    ]
+
+    if fp:
+        lines += ["\n── False Positives (benign flagged as risky) ──"] + fp
+    if fn:
+        lines += ["\n── False Negatives (malicious missed as low) ──"] + fn
+    if wl:
+        lines += ["\n── Wrong Level (detected but wrong severity) ──"] + wl
+    if passed:
+        lines += ["\n── Passed ──"] + passed
+
+    log_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Log saved to: {log_path}")
+
     return failed == 0
 
 
