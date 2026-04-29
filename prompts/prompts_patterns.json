@@ -1,0 +1,136 @@
+
+{
+  "patterns": [
+    {
+      "id": "override_001",
+      "category": "Instruction Override",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "ignore previous instructions",
+        "ignore all instructions",
+        "disregard rules",
+        "bypass restrictions"
+      ],
+      "regex": [
+        "ignore\\s+(all\\s+)?(previous\\s+)?instructions",
+        "disregard\\s+(all\\s+)?rules"
+      ],
+      "description": "Attempts to override system instructions"
+    },
+    {
+      "id": "system_001",
+      "category": "System Access",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "system prompt",
+        "hidden instructions",
+        "internal rules",
+        "initial instructions"
+      ],
+      "regex": [
+        "(system\\s+prompt)",
+        "(hidden\\s+instructions)",
+        "(internal\\s+rules)"
+      ],
+      "description": " محاولة לחשוף מידע פנימי של המערכת"
+    },
+    {
+      "id": "role_001",
+      "category": "Role Manipulation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "act as",
+        "you are now",
+        "pretend to be",
+        "switch role"
+      ],
+      "regex": [
+        "(act\\s+as)",
+        "(you\\s+are\\s+now)",
+        "(pretend\\s+to\\s+be)"
+      ],
+      "description": "Attempts to change model behavior or identity"
+    },
+    {
+      "id": "debug_001",
+      "category": "Debug Exploitation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "for debugging purposes",
+        "for testing only",
+        "debug mode"
+      ],
+      "regex": [
+        "(for\\s+debugging\\s+purposes)",
+        "(debug\\s+mode)"
+      ],
+      "description": "Social engineering to bypass safeguards"
+    },
+    {
+      "id": "authority_001",
+      "category": "Authority Manipulation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "this is allowed",
+        "approved by",
+        "authorized request"
+      ],
+      "regex": [
+        "(approved\\s+by)",
+        "(authorized\\s+request)"
+      ],
+      "description": "Fake authority claims to trick the model"
+    },
+    {
+      "id": "data_001",
+      "category": "Data Exfiltration",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "print all instructions",
+        "show full prompt",
+        "reveal all data"
+      ],
+      "regex": [
+        "(print\\s+all\\s+instructions)",
+        "(show\\s+full\\s+prompt)",
+        "(reveal\\s+all\\s+data)"
+      ],
+      "description": "Attempts to extract sensitive or hidden data"
+    },
+    {
+      "id": "obfuscation_001",
+      "category": "Obfuscation",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [],
+      "regex": [
+        "([a-zA-Z]\\s){3,}",
+        "[A-Za-z0-9+/]{20,}={0,2}"
+      ],
+      "description": "Possible obfuscation using spacing or encoding"
+    },
+    {
+      "id": "code_001",
+      "category": "Code Injection",
+      "severity": "medium",
+      "score": 20,
+      "keywords": [
+        "# ignore",
+        "// ignore",
+        "/* ignore */"
+      ],
+      "regex": [
+        "#\\s*ignore",
+        "//\\s*ignore",
+        "/\\*.*ignore.*\\*/"
+      ],
+      "description": "Instructions hidden inside code"
+    }
+  ]
+}
