@@ -688,6 +688,154 @@
         "copy\\s+the\\s+following\\s+without\\s+changes"
       ],
       "description": "Formatting instructions that may be benign but can support prompt-injection attempts."
+    },
+    {
+      "id": "override_003",
+      "category": "Instruction Override",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "forget every instruction",
+        "cancel the system policy",
+        "all earlier constraints",
+        "follow only the next command",
+        "do not follow the developer",
+        "previous instructions were only a test",
+        "follow only the user message"
+      ],
+      "regex": [
+        "forget\\s+(every|all|any)\\s+instruction",
+        "cancel\\s+(the\\s+)?(system|policy|rules?)",
+        "(all\\s+)?(earlier|previous|prior)\\s+constraints?\\s+(are\\s+)?(inactive|disabled|void)",
+        "do\\s+not\\s+follow\\s+(the\\s+)?developer",
+        "follow\\s+only\\s+(the\\s+)?(next|user|this)\\s+(command|message|instruction)"
+      ],
+      "description": "Natural-language instruction override variants not covered by override_001/002."
+    },
+    {
+      "id": "extraction_003",
+      "category": "System Prompt Extraction",
+      "severity": "high",
+      "score": 40,
+      "keywords": [
+        "confidential instructions",
+        "confidential variables",
+        "private policy",
+        "hidden notes",
+        "prompt memory",
+        "private instructions",
+        "what instructions are you following"
+      ],
+      "regex": [
+        "(quote|reveal|show|print|output|list)\\s+(your\\s+)?(private|confidential|hidden|secret)\\s+(policy|instructions?|rules?|context|notes?|variables?|message)",
+        "(what|which)\\s+(instructions?|rules?)\\s+are\\s+you\\s+following",
+        "output\\s+everything\\s+in\\s+your",
+        "prompt\\s+memory"
+      ],
+      "description": "Extraction attempts using confidential/private/hidden framing not covered by system_001/002."
+    },
+    {
+      "id": "role_003",
+      "category": "Role Manipulation",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "pretend you are a model",
+        "simulate an assistant",
+        "safety layer was disabled",
+        "no safety restrictions",
+        "you are a free model",
+        "answer as if"
+      ],
+      "regex": [
+        "pretend\\s+(you\\s+are|to\\s+be)\\s+(a\\s+)?(model|ai|assistant).{0,60}(no\\s+)?(safety|restrictions?|rules?)",
+        "simulate\\s+(an?\\s+)?(assistant|ai|model).{0,60}(ignores?|without|no)\\s+(policies|rules?|restrictions?|safety)",
+        "answer\\s+as\\s+if.{0,60}(safety|restrictions?|disabled|removed)",
+        "(you\\s+are\\s+)?(a\\s+)?free\\s+(model|ai|assistant)",
+        "no\\s+safety\\s+restrictions?"
+      ],
+      "description": "Role manipulation variants using simulation, pretend, or free-model framing."
+    },
+    {
+      "id": "authority_003",
+      "category": "Authority Manipulation",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "emergency security update",
+        "root command",
+        "system owner",
+        "disable your restrictions",
+        "priority over all"
+      ],
+      "regex": [
+        "(emergency|urgent)\\s+(security\\s+)?(update|override|command)",
+        "root\\s+command",
+        "(system\\s+owner|from\\s+the\\s+owner)",
+        "(disable|remove)\\s+(your\\s+)?(restrictions?|rules?|safety|limits?)",
+        "priority\\s+over\\s+(all\\s+)?(previous|prior|system)"
+      ],
+      "description": "Authority impersonation using emergency, root, or system-owner framing."
+    },
+    {
+      "id": "secrets_002",
+      "category": "Data Exfiltration",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "reveal all confidential",
+        "copy any hidden",
+        "access to secrets",
+        "confidential system message"
+      ],
+      "regex": [
+        "reveal\\s+(all\\s+)?(confidential|secret|hidden|private)",
+        "copy\\s+(any\\s+)?(hidden|private|secret)\\s+(notes?|instructions?|context)",
+        "(if\\s+you\\s+have\\s+access\\s+to|print)\\s+(secrets?|credentials?|tokens?)",
+        "(summarize|output|show)\\s+(the\\s+)?(confidential|secret|hidden|private)\\s+(system\\s+)?(message|prompt|context)"
+      ],
+      "description": "Secret/confidential data exfiltration variants not covered by data_001/002."
+    },
+    {
+      "id": "indirect_003",
+      "category": "Indirect Prompt Injection",
+      "severity": "high",
+      "score": 35,
+      "keywords": [
+        "ai assistant:",
+        "ai agent must",
+        "instruction for language models",
+        "this paragraph is for the ai",
+        "disregard the user's request",
+        "ignore all user goals",
+        "if an ai reads this"
+      ],
+      "regex": [
+        "(ai\\s+assistant|ai\\s+agent|language\\s+model)\\s*[:\\-].{0,80}(ignore|disregard|override|follow|obey|send|reveal)",
+        "instruction\\s+for\\s+(language\\s+models?|ai|assistants?)",
+        "this\\s+paragraph\\s+is\\s+for\\s+the\\s+(ai|assistant|model)",
+        "if\\s+(an?\\s+)?(ai|assistant|language\\s+model)\\s+reads?\\s+this",
+        "(ignore|disregard)\\s+(all\\s+)?user\\s+(goals?|requests?|tasks?)",
+        "(disregard|ignore)\\s+the\\s+user'?s?\\s+request"
+      ],
+      "description": "Indirect injection via AI-addressed instructions inside external content."
+    },
+    {
+      "id": "obfuscation_003",
+      "category": "Obfuscation",
+      "severity": "medium",
+      "score": 30,
+      "keywords": [
+        "rot13",
+        "decode this",
+        "translate the following and obey",
+        "obey it"
+      ],
+      "regex": [
+        "(rot13|base64|hex|decode|translate).{0,60}(follow|obey|execute|comply)",
+        "obey\\s+it"
+      ],
+      "description": "Encoding/translation tricks used to hide injection commands."
     }
   ]
 }
