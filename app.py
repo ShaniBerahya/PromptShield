@@ -10,7 +10,7 @@ app = FastAPI()
 
 RULES_FILE = Path("data/promptshield_prompt_patterns.json")
 
-with RULES_FILE.open() as f:
+with RULES_FILE.open(encoding="utf-8") as f:
     config = json.load(f)
 
 
