@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "PromptShield",
+  "version": "1.0.0",
+  "description": "Detects possible prompt injection attacks before sending prompts to AI tools.",
+  "permissions": [
+    "storage"
+  ],
+    "host_permissions": [
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*",
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*",
+    "https://claude.ai/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "PromptShield"
+  }
+}
