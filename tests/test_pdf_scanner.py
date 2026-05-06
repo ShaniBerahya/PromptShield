@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from hidden_text_scanner import scan_pdf_for_hidden_text
+from engines.hidden_text_scanner import scan_pdf_for_hidden_text
 
 MANIFEST = Path("tests/test_cases/promptshield_pdf_test_bank_manifest.json")
 PDF_DIR  = Path("tests/test_cases")

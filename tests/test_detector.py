@@ -4,10 +4,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detector import analyze
+from engines.prompt_analyzer import analyze
 
-DEFAULT_RULES_FILE = Path("prompts/promptshield_prompt_patterns.json")
-DEFAULT_TESTS_FILE = Path("tests/test_cases/examples.json")
+DEFAULT_RULES_FILE = Path("data/promptshield_prompt_patterns.json")
+DEFAULT_TESTS_FILE = Path("tests/test_cases/prompt_examples.json")
 OUTPUT_DIR = Path("tests/output")
 
 

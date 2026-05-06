@@ -3,12 +3,12 @@ import json
 import tempfile
 from pathlib import Path
 
-from detector import analyze
-from hidden_text_scanner import scan_pdf_for_hidden_text
+from engines.prompt_analyzer import analyze
+from engines.hidden_text_scanner import scan_pdf_for_hidden_text
 
 app = FastAPI()
 
-RULES_FILE = Path("prompts/promptshield_prompt_patterns.json")
+RULES_FILE = Path("data/promptshield_prompt_patterns.json")
 
 with RULES_FILE.open() as f:
     config = json.load(f)
